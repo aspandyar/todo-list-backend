@@ -1,8 +1,12 @@
 package service
 
-import "github.com/aspandyar/todo-list/pkg/repository"
+import (
+	"github.com/aspandyar/todo-list/internal/models"
+	"github.com/aspandyar/todo-list/pkg/repository"
+)
 
 type Authorization interface {
+	CreateUser(user models.User) (int, error)
 }
 
 type TodoList interface {
@@ -18,5 +22,7 @@ type Service struct {
 }
 
 func NewService(repo *repository.Repository) *Service {
-	return &Service{}
+	return &Service{
+		Authorization: NewAuthService(repo.Authorization),
+	}
 }
