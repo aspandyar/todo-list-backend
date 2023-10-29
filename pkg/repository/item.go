@@ -53,7 +53,7 @@ func (r *TodoItemRepository) CreateItem(listId int, item models.TodoItem) (int, 
 func (r *TodoItemRepository) GetAllItem(userId, listId int) ([]models.TodoItem, error) {
 	var items []models.TodoItem
 
-	stmt := "SELECT ti.id, ti.title, ti.description " +
+	stmt := "SELECT ti.id, ti.title, ti.description, ti.done " +
 		"FROM %s ti " +
 		"INNER JOIN %s li ON li.item_id = ti.id " +
 		"INNER JOIN %s ul ON ul.list_id = li.list_id " +
@@ -71,7 +71,7 @@ func (r *TodoItemRepository) GetAllItem(userId, listId int) ([]models.TodoItem, 
 func (r *TodoItemRepository) GetItemById(userId, itemId int) (models.TodoItem, error) {
 	var item models.TodoItem
 
-	stmt := "SELECT ti.id, ti.title, ti.description " +
+	stmt := "SELECT ti.id, ti.title, ti.description, ti.done " +
 		"FROM %s ti " +
 		"INNER JOIN %s li ON li.item_id = ti.id " +
 		"INNER JOIN %s ul ON ul.list_id = li.list_id " +
