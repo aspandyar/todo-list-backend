@@ -66,3 +66,21 @@ func (r *TodoItemRepository) GetAllItem(userId, listId int) ([]models.TodoItem, 
 
 	return items, nil
 }
+
+func (r *TodoItemRepository) GetItemById(userId, itemId int) (models.TodoItem, error) {
+	var item models.TodoItem
+
+	stmt := "SELECT ti.id, ti.title, ti.description " +
+		"FROM %s ti " +
+		"INNER JOIN %s li ON li.item_id = ti.id " +
+		"INNER JOIN %s ul ON ul.list_id = li.list_id " +
+		"WHERE ti.id = $1 AND ul.user_id = $2"
+
+	getAllQuery := fmt.Sprintf(stmt, todoItemTable, listsItemsTable, usersListsTable)
+
+	if err := r.db.Get(&item, getAllQuery, itemId, userId); err != nil {
+		return item, err
+	}
+
+	return item, nil
+}
