@@ -104,7 +104,7 @@ func (r *TodoItemRepository) UpdateItem(userId, itemId int, updateItemInput mode
 	}
 
 	if updateItemInput.Done != nil {
-		setValues = append(setValues, fmt.Sprintf("description=$%d", argsId))
+		setValues = append(setValues, fmt.Sprintf("done=$%d", argsId))
 		args = append(args, *updateItemInput.Done)
 		argsId++
 	}
