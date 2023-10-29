@@ -30,3 +30,14 @@ func (s *TodoItemService) GetAllItem(userId, listId int) ([]models.TodoItem, err
 func (s *TodoItemService) GetItemById(userId, itemId int) (models.TodoItem, error) {
 	return s.repo.GetItemById(userId, itemId)
 }
+
+func (s *TodoItemService) UpdateItem(userId, itemId int, updateItemInput models.UpdateItemInput) error {
+	if err := updateItemInput.Validate(); err != nil {
+		return err
+	}
+	return s.repo.UpdateItem(userId, itemId, updateItemInput)
+}
+
+func (s *TodoItemService) DeleteItem(userId, itemId int) error {
+	return s.repo.DeleteItem(userId, itemId)
+}

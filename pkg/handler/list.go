@@ -90,7 +90,7 @@ func (h *Handler) updateList(c *gin.Context) {
 		return
 	}
 
-	if err := h.services.UpdateList(userId, listId, updateListInput); err != nil {
+	if err := h.services.TodoList.UpdateList(userId, listId, updateListInput); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
