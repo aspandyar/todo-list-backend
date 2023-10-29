@@ -55,8 +55,7 @@ func (r *TodoListRepository) GetAll(userId int) ([]models.TodoList, error) {
 		"INNER JOIN %s ul ON tl.id = ul.lists_id " +
 		"WHERE ul.user_id = $1"
 
-	getAllListQuery := fmt.Sprintf(stmt,
-		todoListsTable, usersListsTable)
+	getAllListQuery := fmt.Sprintf(stmt, todoListsTable, usersListsTable)
 
 	err := r.db.Select(&lists, getAllListQuery, userId)
 
@@ -71,10 +70,20 @@ func (r *TodoListRepository) GetListById(userId, listId int) (models.TodoList, e
 		"INNER JOIN %s ul ON tl.id = ul.lists_id " +
 		"WHERE ul.user_id = $1 AND ul.lists_id = $2"
 
-	getListByIdQuery := fmt.Sprintf(stmt,
-		todoListsTable, usersListsTable)
+	getListByIdQuery := fmt.Sprintf(stmt, todoListsTable, usersListsTable)
 
 	err := r.db.Get(&list, getListByIdQuery, userId, listId)
 
 	return list, err
+}
+
+func (r *TodoListRepository) Delete(userId, listId int) error {
+	stmt := "DELETE FROM %s tl USING %s ul " +
+		"WHERE tl.id = ul.lists_id AND ul.user_id=$1 AND ul.lists_id=$2"
+
+	deleteQuerry := fmt.Sprintf(stmt, todoListsTable, usersListsTable)
+
+	_, err := r.db.Exec(deleteQuerry, userId, listId)
+
+	return err
 }
