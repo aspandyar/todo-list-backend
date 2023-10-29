@@ -45,7 +45,7 @@ func (h *Handler) getAllItems(c *gin.Context) {
 
 	listId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		newErrorResponse(c, http.StatusBadRequest, errors.New("invalid list id param").Error())
+		newErrorResponse(c, http.StatusBadRequest, errors.New("invalid item id param").Error())
 		return
 	}
 
