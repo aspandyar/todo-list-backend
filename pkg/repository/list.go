@@ -21,14 +21,23 @@ func (r *TodoListRepository) Create(userId int, list models.TodoList) (int, erro
 	}
 
 	var listId int
-	createListsQuery := fmt.Sprintf("INSERT INTO %s (title, description) VALUES ($1, $2) RETURNING id", todoListsTable)
+
+	stmt := "INSERT INTO %s (title, description) " +
+		"VALUES ($1, $2) " +
+		"RETURNING id"
+
+	createListsQuery := fmt.Sprintf(stmt, todoListsTable)
 	row := tx.QueryRow(createListsQuery, list.Title, list.Description)
 	if err := row.Scan(&listId); err != nil {
 		_ = tx.Rollback()
 		return 0, err
 	}
 
-	createUsersListsQuery := fmt.Sprintf("INSERT INTO %s (user_id, lists_id) VALUES ($1, $2) RETURNING id", usersListsTable)
+	stmt = "INSERT INTO %s (user_id, lists_id) " +
+		"VALUES ($1, $2) " +
+		"RETURNING id"
+
+	createUsersListsQuery := fmt.Sprintf(stmt, usersListsTable)
 	_, err = tx.Exec(createUsersListsQuery, userId, listId)
 	if err != nil {
 		_ = tx.Rollback()
@@ -41,10 +50,31 @@ func (r *TodoListRepository) Create(userId int, list models.TodoList) (int, erro
 func (r *TodoListRepository) GetAll(userId int) ([]models.TodoList, error) {
 	var lists []models.TodoList
 
-	getAllListQuery := fmt.Sprintf("SELECT tl.id, tl.title, tl.description FROM %s tl INNER JOIN %s ul ON tl.id = ul.lists_id WHERE ul.user_id = $1",
+	stmt := "SELECT tl.id, tl.title, tl.description " +
+		"FROM %s tl " +
+		"INNER JOIN %s ul ON tl.id = ul.lists_id " +
+		"WHERE ul.user_id = $1"
+
+	getAllListQuery := fmt.Sprintf(stmt,
 		todoListsTable, usersListsTable)
 
 	err := r.db.Select(&lists, getAllListQuery, userId)
 
 	return lists, err
+}
+
+func (r *TodoListRepository) GetListById(userId, listId int) (models.TodoList, error) {
+	var list models.TodoList
+
+	stmt := "SELECT tl.id, tl.title, tl.description " +
+		"FROM %s tl " +
+		"INNER JOIN %s ul ON tl.id = ul.lists_id " +
+		"WHERE ul.user_id = $1 AND ul.lists_id = $2"
+
+	getListByIdQuery := fmt.Sprintf(stmt,
+		todoListsTable, usersListsTable)
+
+	err := r.db.Get(&list, getListByIdQuery, userId, listId)
+
+	return list, err
 }
