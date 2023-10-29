@@ -15,7 +15,7 @@ func NewTodoListRepository(db *sqlx.DB) *TodoListRepository {
 	return &TodoListRepository{db: db}
 }
 
-func (r *TodoListRepository) Create(userId int, list models.TodoList) (int, error) {
+func (r *TodoListRepository) CreateList(userId int, list models.TodoList) (int, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
 		return 0, err
@@ -48,7 +48,7 @@ func (r *TodoListRepository) Create(userId int, list models.TodoList) (int, erro
 	return listId, tx.Commit()
 }
 
-func (r *TodoListRepository) GetAll(userId int) ([]models.TodoList, error) {
+func (r *TodoListRepository) GetAllLists(userId int) ([]models.TodoList, error) {
 	var lists []models.TodoList
 
 	stmt := "SELECT tl.id, tl.title, tl.description " +
@@ -78,7 +78,7 @@ func (r *TodoListRepository) GetListById(userId, listId int) (models.TodoList, e
 	return list, err
 }
 
-func (r *TodoListRepository) Update(userId, listId int, updateListInput models.UpdateListInput) error {
+func (r *TodoListRepository) UpdateList(userId, listId int, updateListInput models.UpdateListInput) error {
 	setValues := make([]string, 0)
 	args := make([]interface{}, 0)
 	argsId := 1
@@ -109,7 +109,7 @@ func (r *TodoListRepository) Update(userId, listId int, updateListInput models.U
 	return err
 }
 
-func (r *TodoListRepository) Delete(userId, listId int) error {
+func (r *TodoListRepository) DeleteList(userId, listId int) error {
 	stmt := "DELETE FROM %s tl USING %s ul " +
 		"WHERE tl.id = ul.list_id AND ul.user_id=$1 AND ul.list_id=$2"
 
