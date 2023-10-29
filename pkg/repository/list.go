@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/aspandyar/todo-list/internal/models"
 	"github.com/jmoiron/sqlx"
+	"strings"
 )
 
 type TodoListRepository struct {
@@ -75,6 +76,37 @@ func (r *TodoListRepository) GetListById(userId, listId int) (models.TodoList, e
 	err := r.db.Get(&list, getListByIdQuery, userId, listId)
 
 	return list, err
+}
+
+func (r *TodoListRepository) Update(userId, listId int, updateListInput models.UpdateListInput) error {
+	setValues := make([]string, 0)
+	args := make([]interface{}, 0)
+	argsId := 1
+
+	if updateListInput.Title != nil {
+		setValues = append(setValues, fmt.Sprintf("title=$%d", argsId))
+		args = append(args, *updateListInput.Title)
+		argsId++
+	}
+
+	if updateListInput.Description != nil {
+		setValues = append(setValues, fmt.Sprintf("description=$%d", argsId))
+		args = append(args, *updateListInput.Description)
+		argsId++
+	}
+
+	setUpdateListQuery := strings.Join(setValues, ", ")
+
+	stmt := "UPDATE %s tl SET %s " +
+		"FROM %s ul " +
+		"WHERE tl.id = ul.list_id AND ul.list_id = $%d AND ul.user_id=$%d"
+
+	updateListQuery := fmt.Sprintf(stmt, todoListsTable, setUpdateListQuery, usersListsTable, argsId, argsId+1)
+
+	args = append(args, listId, userId)
+
+	_, err := r.db.Exec(updateListQuery, args...)
+	return err
 }
 
 func (r *TodoListRepository) Delete(userId, listId int) error {
