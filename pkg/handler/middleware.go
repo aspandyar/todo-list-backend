@@ -31,3 +31,19 @@ func (h *Handler) userIdentity(c *gin.Context) {
 
 	c.Set(userCtx, userId)
 }
+
+func getUserId(c *gin.Context) (int, error) {
+	userId, ok := c.Get(userCtx)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, errors.New("user id is not found").Error())
+		return 0, errors.New("user id is not found")
+	}
+
+	idToInt, ok := userId.(int)
+	if !ok {
+		newErrorResponse(c, http.StatusInternalServerError, errors.New("user id is of invalid type").Error())
+		return 0, errors.New("user id is of invalid type")
+	}
+
+	return idToInt, nil
+}
