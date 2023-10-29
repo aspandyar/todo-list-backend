@@ -33,7 +33,7 @@ func (r *TodoListRepository) Create(userId int, list models.TodoList) (int, erro
 		return 0, err
 	}
 
-	stmt = "INSERT INTO %s (user_id, lists_id) " +
+	stmt = "INSERT INTO %s (user_id, list_id) " +
 		"VALUES ($1, $2) " +
 		"RETURNING id"
 
@@ -52,7 +52,7 @@ func (r *TodoListRepository) GetAll(userId int) ([]models.TodoList, error) {
 
 	stmt := "SELECT tl.id, tl.title, tl.description " +
 		"FROM %s tl " +
-		"INNER JOIN %s ul ON tl.id = ul.lists_id " +
+		"INNER JOIN %s ul ON tl.id = ul.list_id " +
 		"WHERE ul.user_id = $1"
 
 	getAllListQuery := fmt.Sprintf(stmt, todoListsTable, usersListsTable)
@@ -67,8 +67,8 @@ func (r *TodoListRepository) GetListById(userId, listId int) (models.TodoList, e
 
 	stmt := "SELECT tl.id, tl.title, tl.description " +
 		"FROM %s tl " +
-		"INNER JOIN %s ul ON tl.id = ul.lists_id " +
-		"WHERE ul.user_id = $1 AND ul.lists_id = $2"
+		"INNER JOIN %s ul ON tl.id = ul.list_id " +
+		"WHERE ul.user_id = $1 AND ul.list_id = $2"
 
 	getListByIdQuery := fmt.Sprintf(stmt, todoListsTable, usersListsTable)
 
@@ -79,11 +79,11 @@ func (r *TodoListRepository) GetListById(userId, listId int) (models.TodoList, e
 
 func (r *TodoListRepository) Delete(userId, listId int) error {
 	stmt := "DELETE FROM %s tl USING %s ul " +
-		"WHERE tl.id = ul.lists_id AND ul.user_id=$1 AND ul.lists_id=$2"
+		"WHERE tl.id = ul.list_id AND ul.user_id=$1 AND ul.list_id=$2"
 
-	deleteQuerry := fmt.Sprintf(stmt, todoListsTable, usersListsTable)
+	deleteQuery := fmt.Sprintf(stmt, todoListsTable, usersListsTable)
 
-	_, err := r.db.Exec(deleteQuerry, userId, listId)
+	_, err := r.db.Exec(deleteQuery, userId, listId)
 
 	return err
 }
